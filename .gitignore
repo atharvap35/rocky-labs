@@ -1,0 +1,12 @@
+/.vagrant/
+/labs/**/.vagrant/
+/backend/__pycache__/
+/node_modules/
+*.log
+*.pyc
+#/ ignore per-lab configs that may contain secrets
+labs/*/config.json
+/.vagrant.d/
+/.idea/
+/.vscode/
+/.env

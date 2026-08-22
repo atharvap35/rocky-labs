@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Linux Learning Platform — Filesystem Lab</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+  </head>
+  <body>
+    <h1>Filesystem Module — MVP</h1>
+    <p>Interactive diagram placeholder.</p>
+    <div>
+      <button id="start">Start VM</button>
+      <button id="status">Check Status</button>
+      <button id="validate">Run Validator</button>
+      <button id="open_ssh">Open SSH (embedded)</button>
+    </div>
+    <div style="margin-top:8px">
+      <input id="snapshot_name" placeholder="snapshot-name" />
+      <button id="snapshot_save">Save Snapshot</button>
+      <button id="snapshot_restore">Restore Snapshot</button>
+      <button id="snapshot_list">List Snapshots</button>
+    </div>
+    <h3>VM Status</h3>
+    <pre id="status_out">(no status yet)</pre>
+    <h4>Lab Info</h4>
+    <pre id="lab_info">(loading...)</pre>
+
+    <h3>Validator Output</h3>
+    <pre id="output">(no validation run)</pre>
+
+    <h3>Embedded Terminal</h3>
+    <div id="terminal" style="width:800px;height:400px;border:1px solid #333;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+    <script>
+      async function fetchStatus() {
+        document.getElementById('status_out').textContent = 'Checking...';
+        try {
+          const res = await fetch('/api/status');
+          const data = await res.json();
+          document.getElementById('status_out').textContent = data.status_raw;
+          // update lab info
+          try {
+            const infoRes = await fetch('/api/lab/info');
+            const info = await infoRes.json();
+            document.getElementById('lab_info').textContent = JSON.stringify(info, null, 2);
+          } catch (e) {
+            document.getElementById('lab_info').textContent = '(lab info unavailable)';
+          }
+        } catch (e) {
+          document.getElementById('status_out').textContent = 'Error: ' + e;
+        }
+      }
+
+      document.getElementById('start').onclick = async () => {
+        document.getElementById('status_out').textContent = 'Starting VM (background)...';
+        await fetch('/api/start', { method: 'POST' });
+        setTimeout(fetchStatus, 3000);
+      }
+
+      document.getElementById('status').onclick = fetchStatus;
+
+      function renderValidation(obj) {
+        const out = document.getElementById('output');
+        if (!obj || typeof obj !== 'object') {
+          out.textContent = JSON.stringify(obj);
+          return;
+        }
+        let html = '';
+        for (const [k, v] of Object.entries(obj)) {
+          if (k === 'all_pass') continue;
+          if (k.endsWith('_ok') || k.endsWith('_present') || k.endsWith('_unmounted') || k === 'fstab_broken_entry') {
+            const pass = Boolean(v);
+            html += `<div><strong>${k}:</strong> <span style="color:${pass ? 'green' : 'red'}">${pass}</span></div>`;
+          } else {
+            html += `<div><strong>${k}:</strong> ${JSON.stringify(v)}</div>`;
+          }
+        }
+        html += `<div><strong>all_pass:</strong> <span style="color:${obj.all_pass ? 'green' : 'red'}">${obj.all_pass}</span></div>`;
+
+        // Render remediation hints if present
+        if (obj.hints && Object.keys(obj.hints).length > 0) {
+          html += '<h4>Remediation Hints</h4>';
+          html += '<ul>';
+          for (const [k, hint] of Object.entries(obj.hints)) {
+            html += `<li><strong>${k}:</strong> ${hint}</li>`;
+          }
+          html += '</ul>';
+        }
+        out.innerHTML = html;
+      }
+
+      document.getElementById('validate').onclick = async () => {
+        document.getElementById('output').textContent = 'Validating...';
+        try {
+          const res = await fetch('/api/validate', { method: 'POST' });
+          const data = await res.json();
+          try {
+            const parsed = JSON.parse(data.stdout || '{}');
+            renderValidation(parsed);
+          } catch (e) {
+            document.getElementById('output').textContent = data.stdout + '\n' + data.stderr;
+          }
+        } catch (e) {
+          document.getElementById('output').textContent = 'Validation error: ' + e;
+        }
+      }
+
+      document.getElementById('snapshot_save').onclick = async () => {
+        const name = document.getElementById('snapshot_name').value || 'autosave';
+        try {
+          const res = await fetch('/api/snapshot/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name }) });
+          const data = await res.json();
+          alert('Snapshot saved');
+        } catch (e) { alert('Snapshot save failed: '+e); }
+      }
+
+      document.getElementById('snapshot_restore').onclick = async () => {
+        const name = document.getElementById('snapshot_name').value;
+        if (!name) { alert('Enter snapshot name'); return; }
+        try {
+          const res = await fetch('/api/snapshot/restore', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name }) });
+          const data = await res.json();
+          alert('Snapshot restored');
+        } catch (e) { alert('Snapshot restore failed: '+e); }
+      }
+
+      document.getElementById('snapshot_list').onclick = async () => {
+        try {
+          const res = await fetch('/api/snapshot/list');
+          const data = await res.json();
+          alert('Snapshots: ' + (data.snapshots || []).join(', '));
+        } catch (e) { alert('Snapshot list failed: '+e); }
+      }
+
+      document.getElementById('open_ssh').onclick = async () => {
+        const termDiv = document.getElementById('terminal');
+        termDiv.innerHTML = '';
+        const term = new window.Terminal();
+        term.open(termDiv);
+
+        const wsProto = (location.protocol === 'https:') ? 'wss' : 'ws';
+        const port = location.port || '8000';
+        // Do not send credentials from the browser; the server will use server-side config or env overrides.
+        const wsUrl = `${wsProto}://${location.hostname}:${port}/ws/terminal`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.addEventListener('open', () => {
+          term.write('\x1b[32mConnected to VM.\x1b[0m\r\n');
+        });
+
+        ws.addEventListener('message', (ev) => {
+          term.write(ev.data);
+        });
+
+        ws.addEventListener('close', () => {
+          term.write('\r\n\x1b[31mDisconnected.\x1b[0m\r\n');
+        });
+
+        term.onData(data => {
+          try { ws.send(data); } catch (e) { }
+        });
+      }
+
+      // poll status every 10s
+      fetchStatus();
+      setInterval(fetchStatus, 10000);
+    </script>
+  </body>
+</html>
