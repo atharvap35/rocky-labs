@@ -15,24 +15,25 @@ Key changes:
 - Deterministic unit tests and CI workflow for unit tests
 - Packaging script `scripts/package_release.ps1` and `docs/RELEASE_MANIFEST.md`
 
-Release steps (local)
----------------------
-Run these locally, then create the GitHub release and attach `release.zip`.
+Release status
+--------------
+The release is published at https://github.com/atharvap35/rocky-labs/releases/tag/v0.1.0.
+The public repository is https://github.com/atharvap35/rocky-labs.
+
+The release asset is `release.zip`; its checksum and size are recorded in `docs/RELEASE_MANIFEST.md`.
+
+Reproduction steps (local)
+--------------------------
+Run these commands when preparing a future release:
 
 ```powershell
-# create a branch
-git checkout -b release/v0.1.0
-# commit prepared changes
-git add .
-git commit -m "chore(release): v0.1.0 filesystem lab MVP"
-# push branch
-git push origin release/v0.1.0
-# (optional) create tag locally
-git tag -a v0.1.0 -m "v0.1.0 filesystem lab MVP"
-git push origin --tags
+# build the package from the repository root
+powershell -ExecutionPolicy Bypass -File .\scripts\package_release.ps1 -Out .\release.zip
+# inspect the package checksum
+Get-FileHash .\release.zip -Algorithm SHA256
 ```
 
-Then create a release on GitHub using the draft notes in `docs/RELEASE_NOTES.md` and attach `release.zip` (sha256 in `docs/RELEASE_MANIFEST.md`).
+Create a new tag and release only after running the tests and the VM integration checklist.
 
 Notes for reviewer
 ------------------

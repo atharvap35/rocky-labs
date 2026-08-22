@@ -1,9 +1,13 @@
 # Roadmap
 
-Short-term (MVP):
-- Complete Filesystem vertical slice (frontend, backend, validator, docs)
-- Expand curriculum with RHCSA core mapping
+Completed MVP:
+- Complete filesystem vertical slice (frontend, backend, validator, docs)
+- Add initial RHCSA core mapping
 - Add CI and contributor docs
+- Publish the `v0.1.0` release package
+
+Current verification gap:
+- Run the end-to-end integration checklist on a Windows host with VirtualBox, Vagrant, and the Rocky Linux box installed.
 
 Medium-term:
 - Implement additional lessons (users, permissions, LVM, systemd, SELinux)
