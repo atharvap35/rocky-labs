@@ -20,6 +20,7 @@ if ($paths.Count -eq 0) {
 
 # Ensure destination is a full path under current directory
 $OutFull = Join-Path -Path (Get-Location) -ChildPath $Out
+$paths = $paths | Where-Object { $_ -ne $OutFull }
 Compress-Archive -Path $paths -DestinationPath $OutFull -Force
 if (Test-Path $OutFull) {
     Write-Output "Package created: $OutFull"
