@@ -57,6 +57,12 @@ If PowerShell blocks activation for the current process, run:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 ```
 
+If Vagrant reports that the PowerShell version is `N/A`, run the command below in the same PowerShell session before using Vagrant:
+
+```powershell
+$env:VAGRANT_PREFERRED_POWERSHELL = "powershell"
+```
+
 Copy the optional local configuration file before starting the backend:
 
 ```powershell

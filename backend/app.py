@@ -53,7 +53,10 @@ class CmdResult(BaseModel):
 
 
 def run_cmd(cmd, cwd=None):
-    proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    env = os.environ.copy()
+    if os.name == 'nt':
+        env.setdefault('VAGRANT_PREFERRED_POWERSHELL', 'powershell')
+    proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=env)
     out, err = proc.communicate()
     return out.decode(), err.decode(), proc.returncode
 
