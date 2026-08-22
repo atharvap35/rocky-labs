@@ -1,5 +1,5 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "rocky/8"
+  config.vm.box = "rockylinux/8"
   config.vm.hostname = "rlp-filesystem-lab"
   config.vm.network "private_network", ip: "192.168.56.101"
   config.vm.provider "virtualbox" do |vb|

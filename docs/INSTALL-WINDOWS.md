@@ -49,5 +49,5 @@ Open a new PowerShell and start the lab VM:
 Open the web UI at http://127.0.0.1:8000/static/index.html
 
 Notes:
-- If `vagrant up` fails, run `vagrant box add rocky/8` to pre-download the box.
+- If `vagrant up` fails, run `vagrant box add rockylinux/8` to pre-download the box.
 - Use `vagrant ssh` to connect directly to the VM.
