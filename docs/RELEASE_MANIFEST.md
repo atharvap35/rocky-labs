@@ -4,8 +4,8 @@ Release manifest
 File: release.zip
 Generated: 2026-08-23
 
-SHA256: 305A278042DB871D70311B4A062A6EF7127F8704BE82B73059A560A04C8CE792
-Size (bytes): 40405
+SHA256: 2EBAE6EEC2D2DF2248632384E4F21C8351203C94D424F2FD35C242777EAE5A91
+Size (bytes): 46702
 
 Included: repository files minus local VM state and secrets.
 Excludes: `.vagrant`, `.env`, `.venv`, `node_modules` (if present), and other local artifacts.

@@ -12,7 +12,7 @@ function Check-Command($name, $friendlyName, $suggestUrl) {
         } catch {
             $ver = "(version unknown)"
         }
-        Write-Host "$friendlyName: OK $ver"
+        Write-Host "${friendlyName}: OK $ver"
         return $true
     }
 }

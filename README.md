@@ -34,7 +34,7 @@ The lab VM is isolated from the Windows host. Learner commands run inside the Ro
 - Vagrant
 - Git
 - Python 3.8 or newer
-- Network access on the first run so Vagrant can download the `rockylinux/8` box
+- Network access on the first run so Vagrant can download the `generic/rocky8` box
 
 Install VirtualBox from https://www.virtualbox.org/ and Vagrant from https://www.vagrantup.com/.
 
@@ -161,7 +161,7 @@ requirements.txt         Python dependencies
 ## Troubleshooting
 
 - `vagrant` or `VBoxManage` not found: install VirtualBox and Vagrant, then reopen PowerShell so PATH changes are loaded.
-- `vagrant up` fails: confirm VirtualBox can start a 2 GB, 2 CPU VM and try `vagrant box add rockylinux/8` first.
+- `vagrant up` fails: confirm VirtualBox can start a 2 GB, 2 CPU VM and try `vagrant box add generic/rocky8` first.
 - The UI cannot validate: confirm the VM is running and that `192.168.56.101` is reachable from Windows.
 - SSH authentication fails: check `.env`, the learner credentials, and the optional SSH key path.
 - `pytest` is not recognized: use `python -m pytest` after activating `.venv`.

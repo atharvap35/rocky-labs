@@ -35,5 +35,6 @@ Release artifacts
 Changelog
 ---------
 
+- 2026-08-23: Fixed Vagrant box to `generic/rocky8`; added `VAGRANT_PREFERRED_POWERSHELL=powershell` for Vagrant 2.4.9 compatibility on Windows PowerShell 5.1; enabled SSH password authentication in provisioner; fixed recursive ownership in provisioner; all validator checks pass (README, ownership, perms, broken fstab, mount state, SELinux, recursive ownership); unit tests pass (4/4); backend API verified; release package updated.
 - 2026-08-22: Added structured validator JSON response and frontend rendering; expanded validator checks (ownership, perms, fstab/mount); added deterministic unit tests and test-run fixes.
- - 2026-08-22: Added remediation hints for failing validator checks (README, SELinux context, recursive ownership) surfaced to frontend; added SELinux and recursive ownership checks and associated unit tests.
+- 2026-08-22: Added remediation hints for failing validator checks (README, SELinux context, recursive ownership) surfaced to frontend; added SELinux and recursive ownership checks and associated unit tests.
